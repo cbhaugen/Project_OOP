@@ -3,24 +3,30 @@ class Board
   attr_reader :PlayGame, :Player
 
   def initialize()
-    @board = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+    @@board = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+  end
+
+  def board
+    @@board
   end
 
   def display_board
     puts "|-----------|"
-    puts "| #{@board[0]} | #{@board[1]} | #{@board[2]} |"
+    puts "| #{@@board[0]} | #{@@board[1]} | #{@@board[2]} |"
     puts "|---+---+---|"
-    puts "| #{@board[3]} | #{@board[4]} | #{@board[5]} |"
+    puts "| #{@@board[3]} | #{@@board[4]} | #{@@board[5]} |"
     puts "|---+---+---|"
-    puts "| #{@board[6]} | #{@board[7]} | #{@board[8]} |"
+    puts "| #{@@board[6]} | #{@@board[7]} | #{@@board[8]} |"
     puts "|-----------|"
   end
 
-  def check_board(choice, symbol)
-    if @board.include?(PlayGame.choice)
-      @board[choice - 1] = symbol
+  def self.check_board(choice, symbol)
+    if @@board&.include?(choice)
+      @@board[choice.to_i - 1] = symbol
     else
       puts "Please choose a valid number"
+      choice = gets.chomp
+      self.check_board(choice, symbol)
     end
   end
 
@@ -36,6 +42,10 @@ class Player
 
   def name
     @name
+  end
+
+  def symbol
+    @symbol
   end
 
 end
@@ -65,14 +75,20 @@ class PlayGame
     case @play1turn
     when true
       puts "#{@player1.name}, type a number to pick a spot."
+      choice = gets.chomp
+      Board.check_board(choice, @player1.symbol)
+      @play1turn = false
     when false
       puts "#{@player2.name}, type a number to pick a spot."
+      choice = gets.chomp
+      Board.check_board(choice, @player2.symbol)
+      @play1turn = true
     else
       puts "error"
     end
 
   end
-  
+
 end
 
 new_game = PlayGame.new()
