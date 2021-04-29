@@ -46,7 +46,6 @@ class PlayGame
   def initialize
     @play1turn = true
     @game_board = Board.new
-    # @game_board.board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
   end
 
   def player_info
@@ -77,8 +76,6 @@ class PlayGame
     puts "#{name}, type a number to pick a spot."
     choice = gets.chomp.to_i
     @game_board.check_board(choice, symbol)
-
-    @game_board.display
   end
 
   def won?(*)
@@ -89,23 +86,25 @@ class PlayGame
     ].freeze
 
     win.any? do |combo|
-      if @board[combo[0]] == @board[combo[1]] &&
-         @board[combo[1]] == @board[combo[2]]
-        if @board[combo[0]] == 'X'
+      if @game_board.board[combo[0]] == @game_board.board[combo[1]] &&
+         @game_board.board[combo[1]] == @game_board.board[combo[2]]
+        if @game_board.board[combo[0]] == 'X'
+          puts 'player1 wins'
           winner(@player1)
-        else winner(@player2)
+        else
+          puts 'player2 wins'
+          winner(@player2)
         end
-      elsif full(board)
+      elsif full(@game_board.board)
         puts "It's a tie!"
-      else pick_space
+        game_loop
+      else game_play
       end
     end
   end
 
   def full(board)
-    board.each do |spot|
-      return false unless spot == ('X' || 'O')
-    end
+    board.all? { |spot| spot.is_a? String }
   end
 
   def winner(winner_name)
@@ -114,6 +113,7 @@ class PlayGame
 
   def play_again
     loop do
+      puts 'Play again? Please press Y or N'
       input = gets.chomp.upcase
       case input
       when 'Y'
