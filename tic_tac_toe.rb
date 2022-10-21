@@ -78,28 +78,20 @@ class PlayGame
     @game_board.check_board(choice, symbol)
   end
 
-  def won?(*)
-    win = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8], # rows
-      [0, 3, 6], [1, 4, 7], [2, 5, 8], # columns
-      [0, 4, 8], [2, 4, 6] # diagonals
+  def won?
+    winning_lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]
     ].freeze
 
-    win.any? do |combo|
-      if @game_board.board[combo[0]] == @game_board.board[combo[1]] &&
-         @game_board.board[combo[1]] == @game_board.board[combo[2]]
-        if @game_board.board[combo[0]] == 'X'
-          puts 'player1 wins'
-          winner(@player1)
-        else
-          puts 'player2 wins'
-          winner(@player2)
-        end
-      elsif full(@game_board.board)
-        puts "It's a tie!"
-        game_loop
-      else game_play
-      end
+    if winning_lines.any? { |line| line.all? { |spot| @game_board.board[spot] == 'X' } }
+      winner(@player1)
+    elsif winning_lines.any? { |line| line.all? { |spot| @game_board.board[spot] == 'O' } }
+      winner(@player2)
+    elsif full(@game_board.board)
+      @game_board.display
+      puts "It's a tie!"
+      play_again
+    else game_play
     end
   end
 
@@ -107,25 +99,21 @@ class PlayGame
     board.all? { |spot| spot.is_a? String }
   end
 
-  def winner(winner_name)
-    puts "#{winner_name}, you win!"
+  def winner(winner)
+    puts "#{winner.name}, you win!"
+    play_again
   end
 
   def play_again
-    loop do
-      puts 'Play again? Please press Y or N'
-      input = gets.chomp.upcase
-      case input
-      when 'Y'
-        return true
-      when 'N'
-        return false
-      end
+    puts 'Play again? Please press Y or N'
+    input = gets.chomp.upcase
+    case input
+    when 'Y'
+      play
+    when 'N'
+      puts 'Quitting Tic Tac Toe'
+      exit(true)
     end
-  end
-
-  def game_loop
-    game_play while play_again
   end
 
   def game_play
@@ -135,6 +123,10 @@ class PlayGame
   end
 end
 
-game = PlayGame.new
-game.player_info
-game.game_play
+def play
+  game = PlayGame.new
+  game.player_info
+  game.game_play
+end
+
+play
